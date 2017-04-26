@@ -1,0 +1,28 @@
+<%- include('../layout/header') %>
+
+<div class="ui grid">
+  <div class="four wide column">
+    <a class="avatar"
+       href="/posts?author=<%= currentUser._id %>"
+       data-title="<%= currentUser.name %> | <%= ({m: '男', f: '女', x: '保密'})[currentUser.gender] %>"
+       data-content="<%= currentUser.bio %>">
+      <img class="avatar" src="/img/<%= currentUser.avatar %>">
+    </a>
+  </div>
+
+  <div class="eight wide column">
+    <form class="ui form segment" method="post" action="/posts/<%= post._id %>/edit">
+      <div class="field required">
+        <label>标题</label>
+        <input type="text" name="title" value="<%= post.title %>">
+      </div>
+      <div class="field required">
+        <label>内容</label>
+        <textarea name="content" rows="15"><%= post.content %></textarea>
+      </div>
+      <input type="submit" class="ui button" value="发布">
+    </form>
+  </div>
+</div>
+
+<%- include('../layout/footer') %>
