@@ -31,21 +31,11 @@ app.use(convert(json()));
 
 app.use(views(__dirname + '/views', { extension: 'ejs' }));
 
-app.use(convert(require('koa-static')(path.join(__dirname, '../public'))));
-
-app.use(middlewares.addHelper);
+app.use(convert(require('koa-static')(path.join(__dirname, 'assets'))));
 
 app.use(convert(flash()));
 
-app.use( async (ctx,next) => {
-  Object.assign(ctx.state, {
-    success: ctx.flash('success').toString(),
-    error: ctx.flash('error').toString(),
-    title: config.blog_title,
-    description: config.blog_description
-  });
-  await next();
-});
+app.use(middlewares.addHelper);
 
 app.use(koaLoggerWinston(logger.successLogger));
 
@@ -53,17 +43,8 @@ app.use(router.routes(), router.allowedMethods());
 
 app.use(koaLoggerWinston(logger.errorLogger));
 
-app.use(async (ctx,next) => {
-  if (ctx.status === 404) {
-    await ctx.render('404',{ title: '404 Page'});
-  }
-  await next();
-});
+app.use(middlewares.catchError);
 
-app.on('error',async (err,ctx) => {
-  await ctx.render('500',{ title:'系统错误',error:err });
-});
-
-app.listen(3000);
+app.listen(config.port);
 
 export default app;

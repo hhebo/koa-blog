@@ -1,7 +1,7 @@
 import winston from 'winston';
 
 let successLogger = new (winston.Logger)({
-  transports:[
+  transports: [
     new winston.transports.Console({
       name:'console-success-log',
       level: 'info',
@@ -16,7 +16,7 @@ let successLogger = new (winston.Logger)({
 });
 
 let errorLogger = new (winston.Logger)({
-  transport:[
+  transport: [
     new winston.transports.Console({
       name: 'console-error-log',
       json: true,

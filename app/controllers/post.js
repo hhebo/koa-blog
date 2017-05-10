@@ -48,7 +48,7 @@ const createPost = async (ctx, next) => {
   try {
     let result = await postModel.create(post);
     post = result.ops[0];
-    ctx.flash('success','发表成功');
+    ctx.flash('success', '发表成功');
     ctx.redirect(`/posts/${post._id}`);
   }catch(e){
     return ctx.redirect('/posts/new');
@@ -107,7 +107,7 @@ const update = async (ctx, next) => {
   let content = ctx.request.body.content;
   try{
     await postModel.updatePostById(postId,author, {title: title, content: content});
-    ctx.flash('success','更新成功');
+    ctx.flash('success', '更新成功');
     ctx.redirect(`/posts/${postId}`);
   }catch(e){
     console.log(e.message);
@@ -119,7 +119,7 @@ const destroy = async (ctx, next) => {
   let author = ctx.session.user._id;
   try {
     await postModel.delPostById(postId, author);
-    ctx.flash('success','删除文章成功');
+    ctx.flash('success', '删除文章成功');
     ctx.redirect('/');
   }catch(e){
     console.log(e.message);
