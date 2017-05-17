@@ -2,26 +2,32 @@ import fs from 'fs';
 import crypto from 'crypto';
 import userModel from '../models/user';
 
-const newUser = async (ctx, next) => {
+const newUser = async (ctx, _next) => {
   const locals = {
     title: 'signup'
   };
   await ctx.render('users/signup', locals);
 };
 
-const createUser = async (ctx, next) => {
-  let req = ctx.req;
-  let name = req.body.name;
-  let gender = req.body.gender;
-  let bio = req.body.bio;
+function encrypt(plainPassword, method) {
+  const hash = crypto.createHash(method);
+  hash.update(plainPassword);
+  return hash.digest('hex');
+}
+
+const createUser = async (ctx, _next) => {
+  const req = ctx.req;
+  const name = req.body.name;
+  const gender = req.body.gender;
+  const bio = req.body.bio;
   let avatar;
   let password = req.body.password;
-  let repassword = req.body.repassword;
+  const repassword = req.body.repassword;
   try {
     if (!(name.trim().length) >= 1 && name.trim().length <= 10) {
       ctx.flash('error', '名字长度为1-10');
     }
-    if (['m','f','x'].indexOf(gender) === -1) {
+    if (['m', 'f', 'x'].indexOf(gender) === -1) {
       ctx.flash('error', '性别不对');
     }
     if (!(bio.trim().length >= 1 && bio.trim().length <= 30)) {
@@ -37,59 +43,59 @@ const createUser = async (ctx, next) => {
       ctx.flash('error', '两次密码不同');
     }
     avatar = req.file.path.split('/').pop();
-  } catch(e) {
+  } catch (e) {
     fs.unlink(ctx.req.file.path);
-    ctx.flash('error',e.message);
-    return ctx.redirect('/users/signup');
+    ctx.flash('error', e.message);
+    ctx.redirect('/users/signup');
   }
-  password = encrypt(password,'sha256');
+  password = encrypt(password, 'sha256');
   let user = {
-    name: name,
-    password: password,
-    gender: gender,
-    bio: bio,
-    avatar: avatar
+    name,
+    password,
+    gender,
+    bio,
+    avatar
   };
   try {
-    let create = await userModel.create(user);
-    user = create.ops[0];
+    const createUserModel = await userModel.create(user);
+    user = createUserModel.ops[0];
     user.password = null;
     ctx.session.user = user;
     ctx.flash('success', '注册成功');
-  } catch(e) {
+  } catch (e) {
     fs.unlink(ctx.req.file.path);
     if (e.message.match('E11000 duplicate key')) {
       ctx.flash('error', '用户名已被占用');
-      return ctx.redirect('/users/signup');
+      ctx.redirect('/users/signup');
     }
   }
   ctx.redirect('/posts');
 };
 
-function encrypt(plainPassword,method){
-  const hash = crypto.createHash(method);
-  hash.update(plainPassword);
-  return hash.digest('hex');
-}
-
-const signin = async (ctx, next) => {
+const signin = async (ctx, _next) => {
   const locals = {
     title: 'signin'
   };
-  await ctx.render('users/signin', locals)
+  await ctx.render('users/signin', locals);
 };
 
-const login = async (ctx, next) => {
-  let name = ctx.request.body.name;
-  let password = ctx.request.body.password;
-  let user = await userModel.getUserByName(name);
+function auth(plainPassword, encryPassword) {
+  const hash = crypto.createHash('sha256');
+  hash.update(plainPassword);
+  return hash.digest('hex') === encryPassword;
+}
+
+const login = async (ctx, _next) => {
+  const name = ctx.request.body.name;
+  const password = ctx.request.body.password;
+  const user = await userModel.getUserByName(name);
   if (!user) {
     ctx.flash('error', '用户不存在');
-    return ctx.redirect('back');
+    ctx.redirect('back');
   }
   if (!auth(password, user.password)) {
     ctx.flash('error', '用户名或者密码错误');
-    return ctx.redirect('back');
+    ctx.redirect('back');
   }
   ctx.flash('success', '登录成功');
   user.password = null;
@@ -97,13 +103,7 @@ const login = async (ctx, next) => {
   ctx.redirect('/posts');
 };
 
-function auth(plainPassword, encryPassword){
-  let hash = crypto.createHash('sha256');
-  hash.update(plainPassword);
-  return hash.digest('hex') === encryPassword ;
-}
-
-const signout = async (ctx, next) => {
+const signout = async (ctx, _next) => {
   ctx.session.user = null;
   ctx.flash('success', '登出成功');
   ctx.redirect('/posts');

@@ -17,19 +17,19 @@ import logger from '../config/logger';
 
 const app = new Koa();
 
-let client = redis.createClient(config.redis_port, config.redis_host);
+const client = redis.createClient(config.redis_port, config.redis_host);
 
 app.keys = ['keys'];
 
 app.use(convert(session({
-  store: redisStore({ client: client })
+  store: redisStore({ client })
 })));
 
 app.use(bodyParser());
 
 app.use(convert(json()));
 
-app.use(views(__dirname + '/views', { extension: 'ejs' }));
+app.use(views(path.join(__dirname, '/views'), { extension: 'ejs' }));
 
 app.use(convert(require('koa-static')(path.join(__dirname, 'assets'))));
 

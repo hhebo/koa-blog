@@ -1,31 +1,31 @@
 import postModel from '../models/post';
 import commentModel from '../models/comment';
 
-const index = async (ctx, next) => {
-  let author = ctx.query.author;
-  let posts = await postModel.getPosts(author);
+const index = async (ctx, _next) => {
+  const author = ctx.query.author;
+  const posts = await postModel.getPosts(author);
   try {
     const locals = {
       title: '首页',
-      posts: posts
+      posts
     };
     await ctx.render('posts/index', locals);
-  }catch(e){
+  } catch (e) {
     console.log(e.message);
   }
 };
 
-const newPost = async (ctx, next) => {
+const newPost = async (ctx, _next) => {
   const locals = {
-    title: 'new post'
+    title: 'New'
   };
   await ctx.render('posts/new', locals);
 };
 
-const createPost = async (ctx, next) => {
-  let author = ctx.session.user._id;
-  let title = ctx.request.body.title;
-  let content = ctx.request.body.content;
+const createPost = async (ctx, _next) => {
+  const author = ctx.session.user._id;
+  const title = ctx.request.body.title;
+  const content = ctx.request.body.content;
   try {
     console.log('校检参数');
     if (!title.length) {
@@ -34,56 +34,57 @@ const createPost = async (ctx, next) => {
     if (!content.length) {
       throw new Error('请填写内容');
     }
-  } catch(e) {
+  } catch (e) {
     console.log('校检参数出错');
-    ctx.flash('error',e.message);
-    return ctx.redirect('back');
+    ctx.flash('error', e.message);
+    ctx.redirect('back');
   }
   let post = {
-    author : author,
-    title : title,
-    content : content,
+    author,
+    title,
+    content,
     pv: 0
   };
   try {
-    let result = await postModel.create(post);
+    const result = await postModel.create(post);
     post = result.ops[0];
     ctx.flash('success', '发表成功');
     ctx.redirect(`/posts/${post._id}`);
-  }catch(e){
-    return ctx.redirect('/posts/new');
+  } catch (e) {
+    console.log(e.message);
+    ctx.redirect('/posts/new');
   }
 };
 
-const show = async (ctx, next) => {
-  let postId = ctx.params.postId;
+const show = async (ctx, _next) => {
+  const postId = ctx.params.postId;
   try {
-    let result = await Promise.all([
+    const result = await Promise.all([
       postModel.getPostById(postId),
       commentModel.getComments(postId),
       postModel.incPv(postId)
     ]);
-    let post = result[0];
-    let comments = result[1];
-    if(!post) {
+    const post = result[0];
+    const comments = result[1];
+    if (!post) {
       throw new Error('该文章不存在');
     }
     const locals = {
       title: post.title,
-      post: post,
-      comments: comments
+      post,
+      comments
     };
     await ctx.render('posts/show', locals);
-  } catch(e) {
+  } catch (e) {
     console.log(e.message);
   }
 };
 
-const edit = async (ctx, next) => {
-  let postId = ctx.params.postId;
-  let author = ctx.session.user._id;
-  try{
-    let post = await postModel.getRawPostById(postId, author);
+const edit = async (ctx, _next) => {
+  const postId = ctx.params.postId;
+  const author = ctx.session.user._id;
+  try {
+    const post = await postModel.getRawPostById(postId, author);
     if (!post) {
       throw new Error('该文章不存在');
     }
@@ -91,37 +92,37 @@ const edit = async (ctx, next) => {
       throw new Error('权限不足');
     }
     const locals = {
-      post: post,
-      title:'编辑文章'
+      post,
+      title: '编辑文章'
     };
     await ctx.render('posts/edit', locals);
-  } catch(e) {
+  } catch (e) {
     console.log(e.message);
   }
 };
 
-const update = async (ctx, next) => {
-  let postId = ctx.params.postId;
-  let author = ctx.session.user._id;
-  let title = ctx.request.body.title;
-  let content = ctx.request.body.content;
-  try{
-    await postModel.updatePostById(postId,author, {title: title, content: content});
+const update = async (ctx, _next) => {
+  const postId = ctx.params.postId;
+  const author = ctx.session.user._id;
+  const title = ctx.request.body.title;
+  const content = ctx.request.body.content;
+  try {
+    await postModel.updatePostById(postId, author, { title, content });
     ctx.flash('success', '更新成功');
     ctx.redirect(`/posts/${postId}`);
-  }catch(e){
+  } catch (e) {
     console.log(e.message);
   }
 };
 
-const destroy = async (ctx, next) => {
-  let postId = ctx.params.postId;
-  let author = ctx.session.user._id;
+const destroy = async (ctx, _next) => {
+  const postId = ctx.params.postId;
+  const author = ctx.session.user._id;
   try {
     await postModel.delPostById(postId, author);
     ctx.flash('success', '删除文章成功');
     ctx.redirect('/');
-  }catch(e){
+  } catch (e) {
     console.log(e.message);
   }
 };

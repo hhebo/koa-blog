@@ -27,15 +27,15 @@ const catchError = async (ctx, next) => {
     if (status < 0) status = 500;
     ctx.status = status;
     ctx.state = {
-      status: status,
+      status,
       currentUser: null
     };
     if (status === 500) console.log('server error', err, ctx);
-    await ctx.render('error/error', { status: status });
+    await ctx.render('error/error', { status });
   }
 };
 
 export default {
   addHelper,
   catchError
-}
+};
