@@ -1,0 +1,38 @@
+{
+  "extends": "airbnb-base",
+  "plugins": [
+    "import"
+  ],
+  "rules": {
+    "new-cap": 0,
+    "strict": 0,
+    "no-underscore-dangle": 0,
+    "no-use-before-define": 1,
+    "eol-last": 1,
+    "arrow-body-style": 0,
+    "global-require": 0,
+    "indent": [2, 2, { "SwitchCase": 0 }],
+    "quotes": [2, "single"],
+    "linebreak-style": [2, "unix"],
+    "semi": [2, "always"],
+    "no-console": 0,
+    "no-param-reassign": 0,
+    "no-debugger": 2,
+    "no-dupe-keys": 2,
+    "no-dupe-args": 2,
+    "no-invalid-regexp": 2,
+    "no-duplicate-case": 2,
+    "use-isnan": 2,
+    "no-sparse-arrays": 2,
+    "no-unreachable": 2,
+    "valid-typeof": 2,
+    "no-cond-assign": 2,
+    "no-func-assign": 2,
+    "no-obj-calls": 2,
+    "no-unused-vars": [1, {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^debug$|^assert$|^withTransaction$"
+    }],
+    "comma-dangle": 0
+  }
+}
