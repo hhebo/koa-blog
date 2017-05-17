@@ -45,6 +45,11 @@ app.use(koaLoggerWinston(logger.errorLogger));
 
 app.use(middlewares.catchError);
 
-app.listen(config.port);
+if (process.env.NODE_ENV === 'production') {
+  const port = process.env.PORT || config.port;
+  app.listen(port);
+} else {
+  app.listen(config.port);
+}
 
 export default app;
