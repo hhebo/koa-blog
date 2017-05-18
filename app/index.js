@@ -17,7 +17,7 @@ import logger from '../config/logger';
 
 const app = new Koa();
 
-const client = redis.createClient(config.redis_port, config.redis_host);
+// const client = redis.createClient(config.redis_port, config.redis_host);
 
 app.keys = ['keys'];
 
