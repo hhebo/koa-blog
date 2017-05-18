@@ -21,9 +21,7 @@ const client = redis.createClient(config.redis_port, config.redis_host);
 
 app.keys = ['keys'];
 
-app.use(convert(session({
-  store: redisStore({ client })
-})));
+app.use(convert(session(app)));
 
 app.use(bodyParser());
 
