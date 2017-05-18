@@ -35,11 +35,11 @@ app.use(convert(flash()));
 
 app.use(middlewares.addHelper);
 
-app.use(koaLoggerWinston(logger.successLogger));
+// app.use(koaLoggerWinston(logger.successLogger));
 
 app.use(router.routes(), router.allowedMethods());
 
-app.use(koaLoggerWinston(logger.errorLogger));
+// app.use(koaLoggerWinston(logger.errorLogger));
 
 app.use(middlewares.catchError);
 
