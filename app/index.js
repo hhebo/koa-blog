@@ -17,11 +17,13 @@ import logger from '../config/logger';
 
 const app = new Koa();
 
-// const client = redis.createClient(config.redis_port, config.redis_host);
+const client = redis.createClient(config.redis_port, config.redis_host);
 
 app.keys = ['keys'];
 
-app.use(convert(session(app)));
+app.use(convert(session({
+  store: redisStore({ client })
+})));
 
 app.use(bodyParser());
 
@@ -35,22 +37,19 @@ app.use(convert(flash()));
 
 app.use(middlewares.addHelper);
 
-// app.use(koaLoggerWinston(logger.successLogger));
+app.use(koaLoggerWinston(logger.successLogger));
 
 app.use(router.routes(), router.allowedMethods());
 
-// app.use(koaLoggerWinston(logger.errorLogger));
+app.use(koaLoggerWinston(logger.errorLogger));
 
 app.use(middlewares.catchError);
 
-// if (process.env.NODE_ENV === 'production') {
-//   const port = process.env.PORT || config.port;
-//   app.listen(port);
-// } else {
-//   app.listen(config.port);
-// }
-
-const port = process.env.PORT || 5000;
-app.listen(port);
+if (process.env.NODE_ENV === 'production') {
+  const port = process.env.PORT || config.port;
+  app.listen(port);
+} else {
+  app.listen(config.port);
+}
 
 export default app;
