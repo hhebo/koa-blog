@@ -3,7 +3,7 @@ import moment from 'moment';
 import objectIdToTimestamp from 'objectid-to-timestamp';
 import config from '../config/default';
 
-const mongolass = new Mongolass(config.mongodb);
+const mongolass = new Mongolass('mongodb://tmac:00..@ds137441.mlab.com:37441/koa-blog');
 
 mongolass.plugin('addCreatedAt', {
   afterFind(results) {
